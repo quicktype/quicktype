@@ -585,7 +585,7 @@ export const newtonsoftCSharpOptions = Object.assign({}, cSharpOptions, {
     baseclass: new EnumOption(
         "base-class",
         "Base class",
-        [["EntityData", "EntityData"], ["Object", undefined]],
+        [["EntityData", "EntityData", "EntityData (Azure)"], ["Object", undefined]],
         "Object",
         "secondary"
     ),
