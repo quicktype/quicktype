@@ -84,7 +84,6 @@ const forbiddenNames = [
     "Maybe",
     "map",
     "toList",
-    "makeArrayEncoder",
     "makeDictEncoder",
     "makeNullableEncoder",
     "Int",
@@ -329,7 +328,7 @@ export class ElmRenderer extends ConvenienceRenderer {
             arrayType =>
                 multiWord(
                     " ",
-                    ["make", this.arrayType, "Encoder"],
+                    ["Jenc.", decapitalize(this.arrayType)],
                     parenIfNeeded(this.encoderNameForType(arrayType.items))
                 ),
             classType => singleWord(this.encoderNameForNamedType(classType)),
@@ -435,7 +434,7 @@ export class ElmRenderer extends ConvenienceRenderer {
         this.emitLine(decoderName, " : Jdec.Decoder ", className);
         this.emitLine(decoderName, " =");
         this.indent(() => {
-            this.emitLine("Jpipe.decode ", className);
+            this.emitLine("Jdec.succeed ", className);
             this.indent(() => {
                 this.forEachClassProperty(c, "none", (_, jsonName, p) => {
                     const propDecoder = parenIfNeeded(this.decoderNameForProperty(p));
@@ -448,7 +447,7 @@ export class ElmRenderer extends ConvenienceRenderer {
 
         const encoderName = this.encoderNameForNamedType(c);
         this.emitLine(encoderName, " : ", className, " -> Jenc.Value");
-        this.emitLine(encoderName, " x =");
+        this.emitLine(encoderName, " v =");
         this.indent(() => {
             this.emitLine("Jenc.object");
             this.indent(() => {
@@ -456,7 +455,7 @@ export class ElmRenderer extends ConvenienceRenderer {
                 this.forEachClassProperty(c, "none", (name, jsonName, p) => {
                     const bracketOrComma = onFirst ? "[" : ",";
                     const propEncoder = this.encoderNameForProperty(p).source;
-                    this.emitLine(bracketOrComma, ' ("', stringEscape(jsonName), '", ', propEncoder, " x.", name, ")");
+                    this.emitLine(bracketOrComma, ' ("', stringEscape(jsonName), '", ', propEncoder, " v.", name, ")");
                     onFirst = false;
                 });
                 if (onFirst) {
@@ -491,7 +490,7 @@ export class ElmRenderer extends ConvenienceRenderer {
 
         const encoderName = this.encoderNameForNamedType(e);
         this.emitLine(encoderName, " : ", enumName, " -> Jenc.Value");
-        this.emitLine(encoderName, " x = case x of");
+        this.emitLine(encoderName, " v = case v of");
         this.indent(() => {
             this.forEachEnumCase(e, "none", (name, jsonName) => {
                 this.emitLine(name, ' -> Jenc.string "', stringEscape(jsonName), '"');
@@ -536,7 +535,7 @@ export class ElmRenderer extends ConvenienceRenderer {
 
         const encoderName = this.encoderNameForNamedType(u);
         this.emitLine(encoderName, " : ", unionName, " -> Jenc.Value");
-        this.emitLine(encoderName, " x = case x of");
+        this.emitLine(encoderName, " v = case v of");
         this.indent(() => {
             this.forEachUnionMember(u, null, "none", sortOrder, (constructor, t) => {
                 if (t.kind === "null") {
@@ -576,11 +575,11 @@ export class ElmRenderer extends ConvenienceRenderer {
             this.emitCommentLines([
                 "To decode the JSON data, add this file to your project, run",
                 "",
-                "    elm-package install NoRedInk/elm-decode-pipeline",
+                "    elm install NoRedInk/elm-json-decode-pipeline",
                 "",
                 "add these imports",
                 "",
-                "    import Json.Decode exposing (decodeString)`);"
+                "    import Json.Decode exposing (decodeString)"
             ]);
             this.emitLine(
                 "--     import ",
@@ -650,12 +649,6 @@ import Dict exposing (Dict, map, toList)`);
 
         this.emitLine("--- encoder helpers");
         this.ensureBlankLine();
-        this.emitLine("make", this.arrayType, "Encoder : (a -> Jenc.Value) -> ", this.arrayType, " a -> Jenc.Value");
-        this.emitLine("make", this.arrayType, "Encoder f arr =");
-        this.indent(() => {
-            this.emitLine("Jenc.", decapitalize(this.arrayType), " (", this.arrayType, ".map f arr)");
-        });
-        this.ensureBlankLine();
         this.emitMultiline(`makeDictEncoder : (a -> Jenc.Value) -> Dict String a -> Jenc.Value
 makeDictEncoder f dict =
     Jenc.object (toList (Dict.map (\\k -> f) dict))
@@ -663,7 +656,7 @@ makeDictEncoder f dict =
 makeNullableEncoder : (a -> Jenc.Value) -> Maybe a -> Jenc.Value
 makeNullableEncoder f m =
     case m of
-    Just x -> f x
+    Just v -> f v
     Nothing -> Jenc.null`);
     }
 }
