@@ -593,6 +593,7 @@ export class DartRenderer extends ConvenienceRenderer {
                         stringEscape(jsonName),
                         '": ',
                         this.toDynamicExpression(property.type, name),
+                        " ?? \"\"",
                         ","
                     );
                 });
