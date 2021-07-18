@@ -90,11 +90,7 @@ export const JavaLanguage: Language = {
   diffViaSchema: false,
   skipDiffViaSchema: [],
   allowMissingNull: false,
-  features: [
-    "enum",
-    "union",
-    "uuid"
-  ],
+  features: ["enum", "union", "uuid"],
   output: "src/main/java/io/quicktype/TopLevel.java",
   topLevel: "TopLevel",
   skipJSON: ["identifiers.json", "simple-identifiers.json", "nst-test-suite.json"],
@@ -117,14 +113,14 @@ export const JavaLanguageWithLegacyDateTime: Language = {
     "337ed.json", // Expects less strict serialization (optional milliseconds).
   ],
   skipMiscJSON: true, // Handles edge cases differently and does not allow optional milliseconds.
-  rendererOptions: {"datetime-provider": "legacy"},
-  quickTestRendererOptions: [{ "array-type": "list"}],
+  rendererOptions: { "datetime-provider": "legacy" },
+  quickTestRendererOptions: [{ "array-type": "list" }],
 };
 
 export const JavaLanguageWithLombok: Language = {
   ...JavaLanguage,
   base: "test/fixtures/java-lombok",
-  quickTestRendererOptions: [{ "array-type": "list", "lombok": "true"}],
+  quickTestRendererOptions: [{ "array-type": "list", lombok: "true" }],
 };
 
 export const PythonLanguage: Language = {
@@ -146,7 +142,7 @@ export const PythonLanguage: Language = {
     "e8b04.json",
     "f6a65.json",
   ],
-  allowMissingNull: false,
+  allowMissingNull: true,
   features: ["enum", "union", "no-defaults", "date-time", "integer-string", "bool-string", "uuid"],
   output: "quicktype.py",
   topLevel: "TopLevel",
@@ -1037,7 +1033,7 @@ export const HaskellLanguage: Language = {
     "recursive.json",
     "bug427.json",
     "nst-test-suite.json",
-    "keywords.json"
+    "keywords.json",
   ],
   skipMiscJSON: false,
   skipSchema: [
@@ -1056,5 +1052,5 @@ export const HaskellLanguage: Language = {
   ],
   rendererOptions: {},
   quickTestRendererOptions: [{ "array-type": "list" }],
-  sourceFiles: ["src/language/Haskell.ts"]
+  sourceFiles: ["src/language/Haskell.ts"],
 };
